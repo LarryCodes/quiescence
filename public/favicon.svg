@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" rx="4" fill="#2c3e50"/>
+  
+  <!-- Chess piece (simplified king) -->
+  <path d="M16 8c-1.1 0-2 .9-2 2v2h4v-2c0-1.1-.9-2-2-2zm-4 4v2h-2v2h2v8h-2v2h12v-2h-2v-8h2v-2h-2v-2h-6z" 
+        fill="#f0d9b5"/>
+  <path d="M14 14h4v2h-4z" fill="#b58863"/>
+  
+  <!-- Q letter -->
+  <text x="22" y="24" font-family="Arial" font-size="10" font-weight="bold" fill="#f0d9b5">Q</text>
+</svg>

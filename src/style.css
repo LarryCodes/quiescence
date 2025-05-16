@@ -1,0 +1,306 @@
+/* Base Styles */
+:root {
+  --light-square: #B0BEC5;    /* New light square color */
+  --dark-square: #4A6F66;    /* New dark square color */
+  --white-piece: #E8F1F2;    /* White pieces */
+  --black-piece: #0D1B2A;    /* Black pieces */
+  --text-dark: #2c3e50;
+  --text-light: #666;
+  --bg-color: #f0f0f0;      /* Page background */
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --board-bg: #ffffff;      /* Board background */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-color);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* App Component Styles */
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.app header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.app h1 {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-dark);
+  font-size: 2.5rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.chess-board-container {
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .app {
+    padding: 1rem;
+  }
+  
+  .chess-board-container {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Chess Board Styles */
+.chess-board {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-shadow: var(--shadow);
+  position: relative;
+  background-color: var(--board-bg);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.board-container {
+  display: flex;
+  flex: 1;
+  position: relative;
+  align-items: stretch;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border: 1px solid #333;
+}
+
+.board-row {
+  display: flex;
+  width: 100%;
+  flex: 1;
+}
+
+.square {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Prisoners (captured pieces) display */
+.prisoners {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  font-size: 1.4em;
+  gap: 7px;
+  margin: 6px 0;
+  padding: 6px 0;
+  background: #f3f3f3;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
+}
+.prisoners-black {
+  background: #f3f3f3;
+  border-bottom: 2px solid #444;
+  margin-bottom: 6px;
+}
+.prisoners-white {
+  background: #f3f3f3;
+  border-top: 2px solid #aaa;
+  margin-top: 6px;
+}
+.prisoner {
+  margin: 0 3px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: #fff9e6;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  font-size: 1.3em;
+}
+
+/* Turn indicator styles */
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  font-weight: bold;
+  margin-bottom: 12px;
+  padding: 6px 0;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  background: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.turn-indicator.white {
+  color: #222;
+  background: #fffbe6;
+  border-color: #f7e9b0;
+}
+.turn-indicator.black {
+  color: #fff;
+  background: #2c3e50;
+  border-color: #1a232e;
+}
+
+/* Selected square */
+.square.selected {
+  background-color: rgba(255, 255, 0, 0.4) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 215, 0, 0.8);
+}
+
+/* Possible move indicator (simple dot) */
+.square.possible-move::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background: rgba(30, 144, 255, 0.45);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.square.possible-move:has(> .chess-piece)::after {
+  width: 80%;
+  height: 80%;
+  background: rgba(220, 38, 38, 0.25);
+  border: 2px solid rgba(220, 38, 38, 0.7);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.square:hover {
+  opacity: 0.9;
+}
+
+.square.light {
+  background-color: var(--light-square);
+}
+
+.square.dark {
+  background-color: var(--dark-square);
+}
+
+/* Chess Piece Styles */
+.chess-piece {
+  font-size: 3em; /* Increased from 2.2em */
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--black-piece); /* Default color for all pieces */
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+  transition: transform 0.1s;
+  pointer-events: none;
+}
+
+.chess-piece:hover {
+  transform: scale(1.1);
+}
+
+/* White pieces (on both light and dark squares) */
+.chess-piece.white {
+  color: var(--white-piece);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Square colors are now defined above */
+
+/* Coordinate Styles */
+.coordinates {
+  display: flex;
+  font-size: 12px;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+
+.top-coordinates, .bottom-coordinates {
+  padding: 0 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left-coordinates, .right-coordinates {
+  flex-direction: column;
+  width: 20px;
+  padding: 10px 0;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.coordinate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: calc((100% - 40px) / 8);
+  margin: 0;
+  position: relative;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .app h1 {
+    font-size: 2rem;
+  }
+}
