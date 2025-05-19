@@ -4,7 +4,7 @@ import ChessBoard from './components/ChessBoard.vue';
 
 <template>
   <div class="app">
-    <header>
+    <header class="compact-header">
       <h1>Quiescence</h1>
     </header>
     <div class="chess-board-container">

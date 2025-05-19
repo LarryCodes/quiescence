@@ -9,6 +9,7 @@ import {
   getQueenMoves, 
   getKingMoves 
 } from './moveGenerator';
+import { parseFen, generateFen, STARTING_FEN } from './fenUtils';
 
 export function useChessEngine() {
   // Game state
@@ -26,6 +27,10 @@ export function useChessEngine() {
   });
   const pieceHasMoved = ref({});
   const inCheck = ref({ white: false, black: false });
+  
+  // FEN-related state
+  const halfmoveClock = ref(0); // Number of halfmoves since the last capture or pawn advance
+  const fullmoveNumber = ref(1); // Incremented after Black's move
   
   // Function to get piece at a position
   const getPiece = (row, col) => {
@@ -351,8 +356,23 @@ export function useChessEngine() {
       inCheck.value.white = isKingInCheck(true);
       inCheck.value.black = isKingInCheck(false);
       
+      // Update FEN-related state
+      const isPawnMove = movingPieceCode === PIECE_CODES.WHITE_PAWN || movingPieceCode === PIECE_CODES.BLACK_PAWN;
+      const isCapture = clickedPiece !== null || (position === enPassantTarget.value); // Regular capture or en passant
+      
+      if (isPawnMove || isCapture) {
+        halfmoveClock.value = 0;
+      } else {
+        halfmoveClock.value++;
+      }
+      
       // Switch turns
       currentPlayer.value = isWhiteTurn ? 'black' : 'white';
+      
+      // Increment fullmove number after Black's move
+      if (!isWhiteTurn) {
+        fullmoveNumber.value++;  
+      }
       return;
     }
 
@@ -380,20 +400,69 @@ export function useChessEngine() {
     }
   };
 
-  // Reset the game
+  // Reset the game to the starting position
   const resetGame = () => {
-    pieces.value = { ...initialPieces };
-    selectedSquare.value = null;
-    currentPlayer.value = 'white';
-    capturedByWhite.value = [];
-    capturedByBlack.value = [];
-    enPassantTarget.value = null;
-    castlingRights.value = {
-      white: { kingSide: true, queenSide: true },
-      black: { kingSide: true, queenSide: true }
-    };
-    pieceHasMoved.value = {};
-    inCheck.value = { white: false, black: false };
+    loadFen(STARTING_FEN);
+  };
+  
+  // Load a position from FEN notation
+  const loadFen = (fen) => {
+    try {
+      const position = parseFen(fen);
+      
+      // Update game state
+      pieces.value = position.pieces;
+      selectedSquare.value = null;
+      currentPlayer.value = position.currentPlayer;
+      capturedByWhite.value = [];
+      capturedByBlack.value = [];
+      enPassantTarget.value = position.enPassantTarget;
+      castlingRights.value = position.castlingRights;
+      pieceHasMoved.value = {};
+      halfmoveClock.value = position.halfmoveClock;
+      fullmoveNumber.value = position.fullmoveNumber;
+      
+      // Determine which pieces have moved based on castling rights
+      if (!position.castlingRights.white.kingSide || !position.castlingRights.white.queenSide) {
+        pieceHasMoved.value['e1'] = true; // White king has moved
+      }
+      if (!position.castlingRights.white.kingSide) {
+        pieceHasMoved.value['h1'] = true; // White kingside rook has moved
+      }
+      if (!position.castlingRights.white.queenSide) {
+        pieceHasMoved.value['a1'] = true; // White queenside rook has moved
+      }
+      if (!position.castlingRights.black.kingSide || !position.castlingRights.black.queenSide) {
+        pieceHasMoved.value['e8'] = true; // Black king has moved
+      }
+      if (!position.castlingRights.black.kingSide) {
+        pieceHasMoved.value['h8'] = true; // Black kingside rook has moved
+      }
+      if (!position.castlingRights.black.queenSide) {
+        pieceHasMoved.value['a8'] = true; // Black queenside rook has moved
+      }
+      
+      // Check if kings are in check
+      inCheck.value.white = isKingInCheck(true);
+      inCheck.value.black = isKingInCheck(false);
+      
+      return true;
+    } catch (error) {
+      console.error('Error loading FEN:', error);
+      return false;
+    }
+  };
+  
+  // Get the current position as FEN notation
+  const getCurrentFen = () => {
+    return generateFen({
+      pieces: pieces.value,
+      currentPlayer: currentPlayer.value,
+      castlingRights: castlingRights.value,
+      enPassantTarget: enPassantTarget.value,
+      halfmoveClock: halfmoveClock.value,
+      fullmoveNumber: fullmoveNumber.value
+    });
   };
 
   // Helper function to check if a piece is white (for UI purposes)
@@ -413,15 +482,30 @@ export function useChessEngine() {
     capturedByWhite,
     capturedByBlack,
     inCheck,
+    enPassantTarget,
+    castlingRights,
+    pieceHasMoved,
+    halfmoveClock,
+    fullmoveNumber,
     
     // Methods
     getPiece,
     isOpponent,
+    isEmpty,
     isSelected: (row, col) => selectedSquare.value === toAlgebraic(row, col),
     isPossibleMove,
     handleSquareClick,
     resetGame,
     isWhitePiece,
+    toAlgebraic,
+    fromAlgebraic,
+    isWithinBoard,
+    isSquareAttacked,
+    isKingInCheck,
+    
+    // FEN-related methods
+    loadFen,
+    getCurrentFen,
     
     // Computed
     possibleMoves
