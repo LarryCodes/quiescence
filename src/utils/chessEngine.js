@@ -1,6 +1,6 @@
 // Chess engine core logic
 import { ref, computed } from 'vue';
-import { initialPieces, toAlgebraic, fromAlgebraic, isWithinBoard, getPieceCode, PIECE_CODES } from './chessUtils';
+import { initialPieces, toAlgebraic, fromAlgebraic, isWithinBoard, getPieceCode, PIECE_CODES } from '@utils/chessUtils';
 import { 
   getPawnMoves, 
   getKnightMoves, 
@@ -8,8 +8,8 @@ import {
   getRookMoves, 
   getQueenMoves, 
   getKingMoves 
-} from './moveGenerator';
-import { parseFen, generateFen, STARTING_FEN } from './fenUtils';
+} from '@utils/moveGenerator';
+import { parseFen, generateFen, STARTING_FEN } from '@utils/fenUtils';
 
 export function useChessEngine() {
   // Game state
@@ -341,8 +341,12 @@ export function useChessEngine() {
       enPassantTarget.value = null; // Reset by default
       if ((movingPieceCode === PIECE_CODES.WHITE_PAWN || movingPieceCode === PIECE_CODES.BLACK_PAWN) && 
           Math.abs(fromPos.row - toPos.row) === 2) {
-        const direction = movingPieceCode === PIECE_CODES.WHITE_PAWN ? -1 : 1;
-        enPassantTarget.value = toAlgebraic(fromPos.row + direction, fromPos.col);
+        // For FEN notation, the en passant target is the square *behind* the pawn
+        // after it moves two squares forward
+        // For white pawn moving from e2 to e4, the en passant target is e3
+        // For black pawn moving from e7 to e5, the en passant target is e6
+        const middleRow = (fromPos.row + toPos.row) / 2; // The row between start and end positions
+        enPassantTarget.value = toAlgebraic(middleRow, fromPos.col);
       }
       
       // Move the selected piece to the new position

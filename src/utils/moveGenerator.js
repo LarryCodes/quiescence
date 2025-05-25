@@ -1,5 +1,5 @@
 // Chess move generation logic
-import { isWithinBoard, toAlgebraic, getPieceCode, PIECE_CODES, isWhitePiece } from './chessUtils';
+import { isWithinBoard, toAlgebraic, getPieceCode, PIECE_CODES, isWhitePiece } from '@utils/chessUtils';
 
 // Generate pawn moves
 export function getPawnMoves(pieceCode, selectedRow, selectedCol, getPiece, isEmpty, isOpponent, enPassantTarget) {
