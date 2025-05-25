@@ -1,5 +1,5 @@
 // FEN (Forsyth-Edwards Notation) utilities
-import { PIECE_CODES } from './chessUtils';
+import { PIECE_CODES } from '@utils/chessUtils';
 
 /**
  * Standard starting position in FEN
