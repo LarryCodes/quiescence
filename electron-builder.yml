@@ -1,0 +1,107 @@
+# Electron Builder Configuration
+# https://www.electron.build/configuration/configuration
+
+appId: com.quiescence.app
+productName: Quiescence
+copyright: Copyright © ${author}
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+
+extraMetadata:
+  main: dist-electron/main.cjs
+
+# Platform specific configurations
+mac:
+  category: public.app-category.games
+  target:
+    - dmg
+    - zip
+  icon: build/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    NSCameraUsageDescription: "Quiescence needs access to your camera for video calling features."
+    NSMicrophoneUsageDescription: "Quiescence needs access to your microphone for audio features."
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+  icon: build/icon.ico
+  publisherName: "${author}"
+  verifyUpdateCodeSignature: false
+
+linux:
+  target:
+    - AppImage
+    - deb
+    - snap
+  category: Game
+  icon: build/icon.png
+  maintainer: "${author}"
+  vendor: "${author}"
+  synopsis: "A beautiful chess application"
+  description: |
+    Quiescence is a modern, feature-rich chess application.
+    Play against the computer or friends, analyze games, and improve your chess skills.
+
+# Build configuration
+publish:
+  provider: github
+  releaseType: release
+
+# Remove console logs in production
+extraResources:
+  - from: "resources/${os}"
+    to: "resources"
+    filter:
+      - "**/*"
+
+# NSIS configuration for Windows
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Quiescence
+  deleteAppDataOnUninstall: true
+  include: build/installer.nsh
+
+# AppImage configuration for Linux
+appImage:
+  license: "LICENSE"
+  category: "Game"
+  synopsis: "A beautiful chess application"
+  description: |
+    Quiescence is a modern, feature-rich chess application.
+    Play against the computer or friends, analyze games, and improve your chess skills.
+
+# Snap configuration for Linux
+snap:
+  confinement: strict
+  grade: stable
+  summary: A beautiful chess application
+  description: |
+    Quiescence is a modern, feature-rich chess application.
+    Play against the computer or friends, analyze games, and improve your chess skills.
+  plugs:
+    - default
+    - home
+    - network
+    - opengl
+    - pulseaudio
+    - x11
+  environment:
+    DISABLE_WAYLAND: 1

@@ -10,6 +10,7 @@ import {
   getKingMoves 
 } from '@utils/moveGenerator';
 import { parseFen, generateFen, STARTING_FEN } from '@utils/fenUtils';
+import { SoundManager } from '@utils/soundUtils';
 
 export function useChessEngine() {
   // Game state
@@ -308,8 +309,10 @@ export function useChessEngine() {
       }
       
       // Handle castling (king moving two squares horizontally)
-      if ((movingPieceCode === PIECE_CODES.WHITE_KING || movingPieceCode === PIECE_CODES.BLACK_KING) && 
-          Math.abs(fromPos.col - toPos.col) === 2) {
+      const isCastling = (movingPieceCode === PIECE_CODES.WHITE_KING || movingPieceCode === PIECE_CODES.BLACK_KING) && 
+          Math.abs(fromPos.col - toPos.col) === 2;
+          
+      if (isCastling) {
         // Determine rook positions
         const isKingSideCastle = toPos.col > fromPos.col;
         const rookFromCol = isKingSideCastle ? 8 : 1;
@@ -320,6 +323,9 @@ export function useChessEngine() {
         const rookToPos = toAlgebraic(row, rookToCol);
         newPieces[rookToPos] = newPieces[rookFromPos];
         delete newPieces[rookFromPos];
+        
+        // Play castling sound
+        SoundManager.playCastling();
       }
       
       // Update castling rights if king or rook moves
@@ -356,9 +362,23 @@ export function useChessEngine() {
       pieces.value = newPieces;
       selectedSquare.value = null; // Deselect after move
       
+      // Play move or capture sound
+      if (clickedPiece) {
+        SoundManager.playCapture();
+      } else {
+        SoundManager.playMove();
+      }
+      
       // Update check status
-      inCheck.value.white = isKingInCheck(true);
-      inCheck.value.black = isKingInCheck(false);
+      const whiteInCheck = isKingInCheck(true);
+      const blackInCheck = isKingInCheck(false);
+      inCheck.value.white = whiteInCheck;
+      inCheck.value.black = blackInCheck;
+      
+      // Play check sound if applicable
+      if (whiteInCheck || blackInCheck) {
+        SoundManager.playCheck();
+      }
       
       // Update FEN-related state
       const isPawnMove = movingPieceCode === PIECE_CODES.WHITE_PAWN || movingPieceCode === PIECE_CODES.BLACK_PAWN;

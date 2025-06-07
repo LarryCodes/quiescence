@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useChessEngine } from '@utils/chessEngine';
 import { files, ranks, BOARD_SIZE } from '@utils/chessUtils';
 import { STARTING_FEN } from '@utils/fenUtils';
+import SoundControl from './SoundControl.vue';
 import '@styles/components/ChessBoard.css';
 
 // Get chess engine functionality
@@ -161,4 +162,7 @@ watch([currentPlayer, pieces], () => {
       </div>
     </div>
   </div>
+  
+  <!-- Sound Controls -->
+  <SoundControl />
 </template>
